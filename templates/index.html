@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Facebook Group Monitor</title>
+    <style>
+        #results {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Facebook Group Monitor</h1>
+    <form id="scan-form">
+        <label for="access_token">Access Token:</label>
+        <input type="text" id="access_token" name="access_token" required>
+        <br>
+        <label for="group_id">Select Group:</label>
+        <select id="group_id" name="group_id" required>
+            <option value="">--Choose a group--</option>
+            <!-- Add more options for each group you want to include -->
+            <option value="624356639516269">Group 1</option>
+        </select>
+        <br>
+        <button type="submit">Scan Group</button>
+    </form>
+    <div id="results">
+        <h2>Scan Results</h2>
+        <ul id="result-list"></ul>
+    </div>
+    <script>
+        document.getElementById('scan-form').addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            const group_id = document.getElementById('group_id').value;
+            const resultList = document.getElementById('result-list');
+            resultList.innerHTML = '';
+
+            const response = await fetch('/scan_group_posts', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: new URLSearchParams({ group_id })
+            });
+
+            const results = await response.json();
+
+            results.forEach(result => {
+                const li = document.createElement('li');
+                li.innerHTML = `<strong>Profanity found:</strong> ${result.content} | <strong>By:</strong> ${result.poster_name} | <strong>Link:</strong> <a href="${result.url}" target="_blank">View Post</a>`;
+                resultList.appendChild(li);
+            });
+        });
+    </script>
+</body>
+</html>
